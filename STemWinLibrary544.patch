@@ -1,0 +1,156 @@
+diff -ruN STemWinLibrary544/Config/GUIConf.c STemWinLibrary544-new/Config/GUIConf.c
+--- STemWinLibrary544/Config/GUIConf.c	2021-02-11 17:08:38.000000000 -0800
++++ STemWinLibrary544-new/Config/GUIConf.c	2019-10-25 09:13:06.000000000 -0700
+@@ -57,7 +57,7 @@
+ //
+ // Define the available number of bytes available for the GUI
+ //
+-#define GUI_NUMBYTES  0x200000
++#define GUI_NUMBYTES  0x6000
+ 
+ /*********************************************************************
+ *
+@@ -85,7 +85,8 @@
+   //
+   // Set default font
+   //
+-  GUI_SetDefaultFont(GUI_FONT_6X8);
++  //GUI_SetDefaultFont(GUI_FONT_6X8);
++  GUI_SetDefaultFont(GUI_FONT_8_ASCII);
+ }
+ 
+ /*************************** End of file ****************************/
+diff -ruN STemWinLibrary544/Config/LCDConf_Lin_Template.c STemWinLibrary544-new/Config/LCDConf_Lin_Template.c
+--- STemWinLibrary544/Config/LCDConf_Lin_Template.c	2021-02-11 17:08:38.000000000 -0800
++++ STemWinLibrary544-new/Config/LCDConf_Lin_Template.c	2019-10-25 09:16:08.000000000 -0700
+@@ -48,6 +48,7 @@
+ 
+ #include "GUI.h"
+ #include "GUIDRV_Lin.h"
++#include "LCDConf_Lin_Template.h"
+ 
+ /*********************************************************************
+ *
+@@ -55,27 +56,9 @@
+ *
+ **********************************************************************
+ */
+-//
+-// Physical display size
+-//
+-#define XSIZE_PHYS 320
+-#define YSIZE_PHYS 240
+-
+-//
+-// Color conversion
+-//
+-#define COLOR_CONVERSION GUICC_8888
+-
+-//
+-// Display driver
+-//
+-#define DISPLAY_DRIVER GUIDRV_WIN32
+-
+-//
+-// Buffers / VScreens
+-//
+-#define NUM_BUFFERS  1 // Number of multiple buffers to be used
+-#define NUM_VSCREENS 1 // Number of virtual screens to be used
++
++// 24-bit color -> 3 bytes per pixel
++unsigned long lcdBuf[((YSIZE_PHYS * XSIZE_PHYS * 3) + 3) / 4];
+ 
+ /*********************************************************************
+ *
+@@ -145,7 +128,8 @@
+     LCD_SetSizeEx (0, XSIZE_PHYS, YSIZE_PHYS);
+     LCD_SetVSizeEx(0, XSIZE_PHYS, YSIZE_PHYS * NUM_VSCREENS);
+   }
+-  LCD_SetVRAMAddrEx(0, (void *)VRAM_ADDR);
++  //LCD_SetVRAMAddrEx(0, (void *)VRAM_ADDR);
++  LCD_SetVRAMAddrEx(0, (void *)&lcdBuf);
+   //
+   // Set user palette data (only required if no fixed palette is used)
+   //
+@@ -156,11 +140,11 @@
+   //
+   // Set custom functions for several operations to optimize native processes
+   //
+-  LCD_SetDevFunc(0, LCD_DEVFUNC_COPYBUFFER, (void(*)(void))CUSTOM_LCD_CopyBuffer);
+-  LCD_SetDevFunc(0, LCD_DEVFUNC_COPYRECT,   (void(*)(void))CUSTOM_LCD_CopyRect);
+-  LCD_SetDevFunc(0, LCD_DEVFUNC_FILLRECT, (void(*)(void))CUSTOM_LCD_FillRect);
+-  LCD_SetDevFunc(0, LCD_DEVFUNC_DRAWBMP_8BPP, (void(*)(void))CUSTOM_LCD_DrawBitmap8bpp); 
+-  LCD_SetDevFunc(0, LCD_DEVFUNC_DRAWBMP_16BPP, (void(*)(void))CUSTOM_LCD_DrawBitmap16bpp);
++  //LCD_SetDevFunc(0, LCD_DEVFUNC_COPYBUFFER, (void(*)(void))CUSTOM_LCD_CopyBuffer);
++  //LCD_SetDevFunc(0, LCD_DEVFUNC_COPYRECT,   (void(*)(void))CUSTOM_LCD_CopyRect);
++  //LCD_SetDevFunc(0, LCD_DEVFUNC_FILLRECT, (void(*)(void))CUSTOM_LCD_FillRect);
++  //LCD_SetDevFunc(0, LCD_DEVFUNC_DRAWBMP_8BPP, (void(*)(void))CUSTOM_LCD_DrawBitmap8bpp); 
++  //LCD_SetDevFunc(0, LCD_DEVFUNC_DRAWBMP_16BPP, (void(*)(void))CUSTOM_LCD_DrawBitmap16bpp);
+ }
+ 
+ /*********************************************************************
+diff -ruN STemWinLibrary544/Config/LCDConf_Lin_Template.h STemWinLibrary544-new/Config/LCDConf_Lin_Template.h
+--- STemWinLibrary544/Config/LCDConf_Lin_Template.h	2021-02-11 17:08:38.000000000 -0800
++++ STemWinLibrary544-new/Config/LCDConf_Lin_Template.h	2019-12-22 21:45:32.000000000 -0800
+@@ -49,6 +49,30 @@
+ #ifndef LCDCONF_H
+ #define LCDCONF_H
+ 
++//
++// Physical display size
++//
++#define XSIZE_PHYS 128
++#define YSIZE_PHYS 128
++
++//
++// Color conversion
++//
++#define COLOR_CONVERSION GUICC_888
++
++//
++// Display driver
++//
++#define DISPLAY_DRIVER GUIDRV_LIN_OXY_24 //GUIDRV_LIN_24
++
++//
++// Buffers / VScreens
++//
++#define NUM_BUFFERS  1 // Number of multiple buffers to be used
++#define NUM_VSCREENS 1 // Number of virtual screens to be used
++
++extern unsigned long lcdBuf[((YSIZE_PHYS * XSIZE_PHYS * 3) + 3) / 4];
++
+ #endif /* LCDCONF_H */
+ 
+ /*************************** End of file ****************************/
+diff -ruN STemWinLibrary544/OS/GUI_X.c STemWinLibrary544-new/OS/GUI_X.c
+--- STemWinLibrary544/OS/GUI_X.c	2021-02-11 17:08:38.000000000 -0800
++++ STemWinLibrary544-new/OS/GUI_X.c	2019-10-25 09:11:32.000000000 -0700
+@@ -47,6 +47,10 @@
+   */
+ 
+ #include "GUI.h"
++// Cannot include bsp.h since it is a C++ header file. Therefore we extern the C function required ere.
++//#include "bsp.h"
++#include <stdint.h>
++uint32_t GetSystemMs();
+ 
+ /*********************************************************************
+ *
+@@ -66,12 +70,13 @@
+ */
+ 
+ GUI_TIMER_TIME GUI_X_GetTime(void) { 
+-  return OS_TimeMS; 
++  return GetSystemMs(); //OS_TimeMS;
+ }
+ 
++// Unused, but kept for completeness.
+ void GUI_X_Delay(int ms) { 
+-  int tEnd = OS_TimeMS + ms;
+-  while ((tEnd - OS_TimeMS) > 0);
++  int tEnd = (int)GetSystemMs() + ms; //OS_TimeMS + ms;
++  while ((tEnd - (int)GetSystemMs()) > 0); //tEnd - OS_TimeMS
+ }
+ 
+ /*********************************************************************

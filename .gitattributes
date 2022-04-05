@@ -1,0 +1,26 @@
+# Handle line endings automatically for files detected as text 
+# and leave all files detected as binary untouched.
+* text=auto
+
+# Never modify line endings of patch files.
+*.patch -text
+
+#
+# The above will handle all files NOT found below
+#
+# These files are text and should be normalized (Convert crlf => lf)
+*.c           text
+*.cpp         text
+*.cc          text
+*.h           text 
+*.hpp         text 
+*.js          text
+*.json        text
+*.txt         text
+*.scxml       text
+*.uxf         text
+
+# These files are binary and should be left untouched
+# (binary is macro for -text -diff)
+*.pdf         binary
+*.png         binary

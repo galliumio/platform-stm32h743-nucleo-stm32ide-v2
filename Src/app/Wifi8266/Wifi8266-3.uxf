@@ -1,0 +1,768 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.3.0">
+  <help_text>// Uncomment the following line to change the fontsize and font:
+fontsize=11
+fontfamily=Monospaced //possible: SansSerif,Serif,Monospaced
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////
+// Welcome to UMLet!
+//
+// Double-click on elements to add them to the diagram, or to copy them
+// Edit elements by modifying the text in this panel
+// Hold Ctrl to select multiple elements
+// Use Ctrl+mouse to select via lasso
+//
+// Use +/- or Ctrl+mouse wheel to zoom
+// Drag a whole relation at its central square icon
+//
+// Press Ctrl+C to copy the whole diagram to the system clipboard (then just paste it to, eg, Word)
+// Edit the files in the "palettes" directory to create your own element palettes
+//
+// Select "Custom Elements &gt; New..." to create new element types
+//////////////////////////////////////////////////////////////////////////////////////////////
+
+
+// This text will be stored with each diagram;  use it for notes.</help_text>
+  <zoom_level>11</zoom_level>
+  <element>
+    <id>UMLSpecialState</id>
+    <coordinates>
+      <x>748</x>
+      <y>418</y>
+      <w>22</w>
+      <h>22</h>
+    </coordinates>
+    <panel_attributes>type=initial</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>759</x>
+      <y>418</y>
+      <w>77</w>
+      <h>66</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;&gt;</panel_attributes>
+    <additional_attributes>10.0;10.0;50.0;10.0;50.0;40.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>704</x>
+      <y>462</y>
+      <w>341</w>
+      <h>154</h>
+    </coordinates>
+    <panel_attributes>Idle
+--
+WIFI8266_TX_DATA_REQ
+/ if (dataOutFifo not empty)
+    ^^SEND_DATA
+valign=top
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>187</x>
+      <y>814</y>
+      <w>495</w>
+      <h>561</h>
+    </coordinates>
+    <panel_attributes>TxCmd
+--
+entry/ start txCmdTimer,
+       txCmdCfm = new Wifi8266TxCmdCfm
+exit/ stop txCmdTimer,
+      post txCmdCfm to WIFI8266, ClearInSeq()
+TX_CMD_TIMER/ txCmdRsp.error = TIMEOUT,
+              ^^DONE
+valign=top
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>121</x>
+      <y>704</y>
+      <w>1573</w>
+      <h>1001</h>
+    </coordinates>
+    <panel_attributes>Busy
+--
+exit/ recall
+WIFI8266_TX_CMD_REQ/ defer
+WIFI8266_TX_DATA_REQ/ defer
+valign=top
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>924</x>
+      <y>781</y>
+      <w>715</w>
+      <h>880</h>
+    </coordinates>
+    <panel_attributes>TxData
+--
+entry/ start stateTimer,
+       dataLen = bytes in dataOutFifo
+exit/ stop stateTimer
+STATE_TIMER/ ^^FAULT_EVT
+valign=top
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>825</x>
+      <y>605</y>
+      <w>33</w>
+      <h>407</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;&gt;</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;350.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>693</x>
+      <y>1243</y>
+      <w>231</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>[space in uartOutFifo]
+style=wordwrap</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>616</x>
+      <y>1023</y>
+      <w>242</w>
+      <h>231</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;&gt;</panel_attributes>
+    <additional_attributes>200.0;10.0;200.0;190.0;10.0;190.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>220</x>
+      <y>1155</y>
+      <w>407</w>
+      <h>176</h>
+    </coordinates>
+    <panel_attributes>TxCmdRspWait
+--
+entry/ write saved cmd to uartOutFifo,
+       if (uartOutFifo was empty) ^UART_OUT_WRITE_REQ
+WIFI8266_RX_RSP_IND(rspStr)
+/ txCmdCfm.AddRspStr(rspStr)
+  if (rspStr success)
+    txCmdCfm.error = SUCCESS, ^^DONE
+  else (rspStr fail)
+    txCmdCfm.error = HARDWARE, ^^DONE
+  else if (txCmdCfm full)
+    txCmdCfm.error = HARDWARE, ^^FAULT_EVT
+valign=top
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLSpecialState</id>
+    <coordinates>
+      <x>814</x>
+      <y>990</y>
+      <w>44</w>
+      <h>44</h>
+    </coordinates>
+    <panel_attributes>type=decision</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>660</x>
+      <y>638</y>
+      <w>176</w>
+      <h>55</h>
+    </coordinates>
+    <panel_attributes>WIFI8266_TX_CMD_REQ
+/ SaveInSeq(),
+  save cmd
+style=wordwrap</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLSpecialState</id>
+    <coordinates>
+      <x>407</x>
+      <y>770</y>
+      <w>22</w>
+      <h>22</h>
+    </coordinates>
+    <panel_attributes>type=initial</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>418</x>
+      <y>770</y>
+      <w>77</w>
+      <h>66</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;&gt;</panel_attributes>
+    <additional_attributes>10.0;10.0;50.0;10.0;50.0;40.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>616</x>
+      <y>1001</y>
+      <w>220</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;&gt;</panel_attributes>
+    <additional_attributes>180.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>528</x>
+      <y>528</y>
+      <w>198</w>
+      <h>198</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;&gt;</panel_attributes>
+    <additional_attributes>10.0;160.0;10.0;10.0;160.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>583</x>
+      <y>506</y>
+      <w>66</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>DONE
+style=wordwrap</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>418</x>
+      <y>1045</y>
+      <w>33</w>
+      <h>132</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;100.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>440</x>
+      <y>1078</y>
+      <w>231</w>
+      <h>55</h>
+    </coordinates>
+    <panel_attributes>UART_OUT_EMPTY_IND
+/ assert(enough space)
+style=wordwrap</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>704</x>
+      <y>979</y>
+      <w>66</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>[else]
+style=wordwrap</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>0</x>
+      <y>0</y>
+      <w>1804</w>
+      <h>1793</h>
+    </coordinates>
+    <panel_attributes>Wifi8266Tx::Root
+--
+WIFI8266_TX_CMD_REQ/ ^WIFI8266_TX_CMD_CFM(state)
+valign=top
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>1133</x>
+      <y>1023</y>
+      <w>451</w>
+      <h>110</h>
+    </coordinates>
+    <panel_attributes>TxDataReadyWait
+--
+entry/ write AT cmd(dataLen) to uartOutFifo
+WIFI8266_RX_RSP_IND[rsp == '&gt;']/ ^^READY
+valign=top
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>1133</x>
+      <y>880</y>
+      <w>451</w>
+      <h>77</h>
+    </coordinates>
+    <panel_attributes>TxDataBufWait
+--
+valign=top
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLSpecialState</id>
+    <coordinates>
+      <x>517</x>
+      <y>913</y>
+      <w>22</w>
+      <h>22</h>
+    </coordinates>
+    <panel_attributes>type=initial</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>517</x>
+      <y>913</y>
+      <w>88</w>
+      <h>66</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;&gt;</panel_attributes>
+    <additional_attributes>10.0;10.0;60.0;10.0;60.0;40.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>1133</x>
+      <y>1430</y>
+      <w>451</w>
+      <h>187</h>
+    </coordinates>
+    <panel_attributes>TxDataRspWait
+--
+WIFI8266_RX_RSP_IND(rspStr) 
+/ if (rspStr success)
+    ^^DONE,
+    if (dataOutFifo not empty)
+      ^WIFI8266_TX_DATA_REQ to self
+    else
+      ^WIFI8266_TX_EMPTY_IND to WIFI8266  
+valign=top
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>1408</x>
+      <y>649</y>
+      <w>99</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>FAULT_EVT
+style=wordwrap</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLSpecialState</id>
+    <coordinates>
+      <x>979</x>
+      <y>957</y>
+      <w>22</w>
+      <h>22</h>
+    </coordinates>
+    <panel_attributes>type=initial</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>979</x>
+      <y>968</y>
+      <w>66</w>
+      <h>55</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;&gt;</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;30.0;40.0;30.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>220</x>
+      <y>957</y>
+      <w>407</w>
+      <h>99</h>
+    </coordinates>
+    <panel_attributes>TxCmdBufWait
+--
+valign=top
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>539</x>
+      <y>121</y>
+      <w>649</w>
+      <h>121</h>
+    </coordinates>
+    <panel_attributes>Stopped
+--
+valign=top
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>66</x>
+      <y>363</y>
+      <w>1683</w>
+      <h>1386</h>
+    </coordinates>
+    <panel_attributes>Started
+--
+exit/ clear uartOutHsmn
+      clear uartOutFifo, dataOutFifo ptrs
+valign=top
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>946</x>
+      <y>1276</y>
+      <w>154</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>UART_OUT_EMPTY_IND
+style=wordwrap</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>1133</x>
+      <y>1199</y>
+      <w>451</w>
+      <h>154</h>
+    </coordinates>
+    <panel_attributes>TxDataSendWait
+--
+entry/ txLen = min(dataLen, uartOutFifo avail cnt)
+       write data(txLen) from dataOutFifo to uartOutFifo,
+       if (uartOutFifo was empty) ^UART_OUT_WRITE_REQ
+       dataLen -= txLen,
+       if (dataLen == 0) ^^DONE
+valign=top
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLSpecialState</id>
+    <coordinates>
+      <x>1023</x>
+      <y>979</y>
+      <w>44</w>
+      <h>44</h>
+    </coordinates>
+    <panel_attributes>type=decision</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1034</x>
+      <y>913</y>
+      <w>121</w>
+      <h>88</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;&gt;</panel_attributes>
+    <additional_attributes>10.0;60.0;10.0;10.0;90.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1034</x>
+      <y>1012</y>
+      <w>121</w>
+      <h>88</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;&gt;</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;60.0;90.0;60.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>990</x>
+      <y>1078</y>
+      <w>132</w>
+      <h>44</h>
+    </coordinates>
+    <panel_attributes>[AT cmd fits in 
+ uartOutFifo]
+style=wordwrap</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>1056</x>
+      <y>891</y>
+      <w>66</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>[else]
+style=wordwrap</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1331</x>
+      <y>946</y>
+      <w>33</w>
+      <h>99</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;&gt;</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;70.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>1243</x>
+      <y>462</y>
+      <w>341</w>
+      <h>154</h>
+    </coordinates>
+    <panel_attributes>Fault
+--
+entry/ ^WIFI8266_TX_FAULT_IND
+valign=top
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1397</x>
+      <y>605</y>
+      <w>33</w>
+      <h>121</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;&gt;</panel_attributes>
+    <additional_attributes>10.0;90.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1331</x>
+      <y>1122</y>
+      <w>33</w>
+      <h>99</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;&gt;
+</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;70.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1078</x>
+      <y>1243</y>
+      <w>77</w>
+      <h>99</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;&gt;</panel_attributes>
+    <additional_attributes>50.0;70.0;10.0;70.0;10.0;10.0;50.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>1353</x>
+      <y>1155</y>
+      <w>66</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>DONE
+style=wordwrap</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1331</x>
+      <y>1342</y>
+      <w>33</w>
+      <h>110</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;&gt;
+</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;80.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>1353</x>
+      <y>1375</y>
+      <w>77</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>DONE
+style=wordwrap</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>715</x>
+      <y>231</y>
+      <w>33</w>
+      <h>154</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;&gt;</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;120.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>957</x>
+      <y>231</y>
+      <w>33</w>
+      <h>154</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;&gt;</panel_attributes>
+    <additional_attributes>10.0;120.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>473</x>
+      <y>264</y>
+      <w>264</w>
+      <h>66</h>
+    </coordinates>
+    <panel_attributes>WIFI8266_TX_START_REQ
+/ save uartOutHsmn,
+  save uartOutFifo, dataOutFifo
+style=wordwrap</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>979</x>
+      <y>286</y>
+      <w>198</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>WIFI8266_TX_STOP_REQ
+style=wordwrap</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1034</x>
+      <y>528</y>
+      <w>165</w>
+      <h>275</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;&gt;</panel_attributes>
+    <additional_attributes>10.0;10.0;130.0;10.0;130.0;230.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>1078</x>
+      <y>506</y>
+      <w>88</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>SEND_DATA
+style=wordwrap</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLSpecialState</id>
+    <coordinates>
+      <x>792</x>
+      <y>77</y>
+      <w>22</w>
+      <h>22</h>
+    </coordinates>
+    <panel_attributes>type=initial</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>803</x>
+      <y>77</y>
+      <w>77</w>
+      <h>66</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;&gt;</panel_attributes>
+    <additional_attributes>10.0;10.0;50.0;10.0;50.0;40.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>1342</x>
+      <y>968</y>
+      <w>286</w>
+      <h>44</h>
+    </coordinates>
+    <panel_attributes>UART_OUT_EMPTY_IND
+/ assert(AT cmd fits in uartOUtFifo)
+style=wordwrap</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>1298</x>
+      <y>1551</y>
+      <w>220</w>
+      <h>55</h>
+    </coordinates>
+    <panel_attributes>Ignore unexpected rspStr. 
+If no success rspStr comes,
+let timeout handles it.
+style=wordwrap</panel_attributes>
+    <additional_attributes/>
+  </element>
+</diagram>

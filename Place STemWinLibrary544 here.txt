@@ -1,0 +1,12 @@
+1. Create a folder named "STemWinLibrary544" in this directory.
+2. Download emWin library contained in STM32CubeH7 from www.st.com. 
+   Select version 1.9.0 (latest) or an older version from 1.5.0.
+3. Expand the downloaded zip file. Copy the content of the subdir "Middlewares\ST\STemWin" to "STemWinLibrary544"
+4. After copying, the folder "STemWinLibrary544" should contain subdirs of Config, Documentation, inc, Lib, OS, Simulation and Software.
+5. In Lib, rename the file "STemWin_CM7_wc32.a" to "libSTemWin_CM7_wc32.a". You may delete other library files.
+6. In Config, delete or add file extension ".unused" to the files "GUIDRV_Template.c/h" and "LCDConf_FlexColor_Template.c/h".
+7. In OS, delete or add file extension ".unused" to the file "GUI_X_OS.c".
+8. Apply patch by running "patch -s -p0 < STemWinLibrary544.patch" in this directory.
+   It modifies the files "Config/GUIConf.c", "Config/LCDConf_Lin_Template.c/h" and "OS/GUI_X_OS.c". 
+
+
