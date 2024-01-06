@@ -580,7 +580,7 @@ QState GuiMgr::Ticker(GuiMgr * const me, QEvt const * const e) {
             if (req.GetIndex() < 3) {
                 me->m_ticker1.SetText(req.GetIndex(), req.GetText(), GUI_FONT_20B_ASCII, req.GetFgColor(), req.GetBgColor());
             } else if (req.GetIndex() < 6) {
-                me->m_text1.SetText(req.GetIndex() - 3, req.GetText(), GUI_FONT_13B_ASCII, req.GetFgColor(), req.GetBgColor());
+                me->m_text1.SetText(req.GetIndex() - 3, req.GetText(), GUI_FONT_16B_ASCII, req.GetFgColor(), req.GetBgColor());
             }
             me->SendCfmMsg(new GuiMgrTickerCfm(DispTickerCfmMsg(MSG_ERROR_SUCCESS)), req);
             WM_Exec();
